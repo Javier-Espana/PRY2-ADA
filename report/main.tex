@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\geometry{margin=1in}
+
+\title{Proyecto \#2 2026: Paint the Fence -- Minimum Cost Interval Cover}
+\author{Grupo de trabajo}
+\date{Mayo 2026}
+
+\begin{document}
+\maketitle
+
+\section{Descripcion del problema}
+Se modela una valla discreta con posiciones enteras desde $0$ hasta $L$. Cada pintor $i$ cubre un intervalo cerrado $[l_i, r_i]$ y tiene un costo positivo $c_i$. El objetivo es seleccionar un subconjunto de pintores cuya union cubra toda la valla y cuyo costo total sea minimo.
+
+Este problema es una variante clasica de cobertura de intervalos ponderada. Para los experimentos de este proyecto se asume que las coordenadas son enteras, de modo que la programacion dinamica puede recorrer la valla posicion por posicion.
+
+\section{Analisis del problema}
+\subsection{Subestructura optima}
+Sea $dp[x]$ el costo minimo para cubrir el prefijo $[0,x]$. Una solucion optima para $[0,x]$ termina con algun intervalo $i$ que cubre la posicion $x$. Si ese intervalo inicia en $l_i$, entonces todo el prefijo anterior $[0,l_i-1]$ debe estar cubierto de manera optima, porque cualquier solucion mejor para ese prefijo produciria una solucion mejor para $[0,x]$.
+
+Por tanto, el problema presenta subestructura optima.
+
+\subsection{Relacion de recurrencia}
+La recurrencia exacta es:
+\[
+dp[x] = \min_{i:\, l_i \le x \le r_i} \left(dp[l_i - 1] + c_i\right),
+\]
+donde $dp[-1] = 0$. Si no existe intervalo que cubra $x$, entonces $dp[x] = \infty$.
+
+\section{Algoritmos de solucion}
+\subsection{Programacion dinamica}
+\begin{algorithm}[H]
+\caption{DP exacta para cobertura de la valla}
+\begin{algorithmic}[1]
+\Require Valla de longitud $L$, intervalos $(l_i, r_i, c_i)$
+\Ensure Costo minimo y conjunto de intervalos elegidos
+\State Inicializar $dp[0..L] \leftarrow \infty$
+\For{$x \leftarrow 0$ to $L$}
+    \State $mejor \leftarrow \infty$
+    \For{cada intervalo $i$}
+        \If{$l_i \le x \le r_i$}
+            \State $prev \leftarrow 0$ si $l_i = 0$, en otro caso $dp[l_i-1]$
+            \State $mejor \leftarrow \min(mejor, prev + c_i)$
+        \EndIf
+    \EndFor
+    \State $dp[x] \leftarrow mejor$
+\EndFor
+\State Reconstruir la solucion siguiendo los punteros guardados
+\end{algorithmic}
+\end{algorithm}
+
+Su tiempo de ejecucion es $O(nL)$, donde $n$ es la cantidad de pintores y $L$ la longitud de la valla. Como depende del valor numerico de $L$, es una solucion pseudo-polynomial.
+
+\subsection{Greedy}
+\begin{algorithm}[H]
+\caption{Heuristica greedy por eficiencia cobertura/costo}
+\begin{algorithmic}[1]
+\Require Valla de longitud $L$, intervalos $(l_i, r_i, c_i)$
+\Ensure Cobertura heuristica
+\State Ordenar intervalos por $l_i$
+\State $x \leftarrow 0$
+\While{$x \le L$}
+    \State Insertar en una cola de prioridad los intervalos con $l_i \le x$
+    \State Eliminar intervalos vencidos con $r_i < x$
+    \State Seleccionar el intervalo con mayor $\frac{r_i-l_i+1}{c_i}$, rompiendo empates por mayor $r_i$
+    \State Agregarlo a la solucion y actualizar $x \leftarrow r_i + 1$
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+La complejidad es $O(n \log n)$: cada intervalo entra y sale de la cola de prioridad una sola vez.
+
+\section{Discusion sobre greedy choice property}
+Esta propiedad no se cumple en general para el problema ponderado. El criterio local de mayor eficiencia cobertura/costo puede escoger un intervalo barato y aparentemente conveniente que obliga a pagar mas en los pasos siguientes, mientras que una opcion ligeramente menos atractiva a corto plazo puede conducir a una solucion globalmente mas barata.
+
+El archivo de resultados genera automaticamente un contraejemplo concreto y documenta que el costo de la heuristica es mayor que el de la solucion exacta.
+
+\section{Analisis empirico}
+Se ejecutaron ambas implementaciones sobre familias reproducibles de instancias aleatorias factibles. La semilla y los tamanos se fijaron para obtener mediciones honestas y repetibles. Cada tamano se ejecuto varias veces y se reporto la mediana de tiempos.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../results/benchmark_scatter.png}
+\caption{Tiempos de ejecucion de la DP exacta y de la heuristica greedy en funcion del tamano de entrada.}
+\end{figure}
+
+\subsection{Datos usados}
+\input{../results/benchmark_summary.tex}
+
+\subsection{Regresion polinomial}
+Para cada algoritmo se ajusto una regresion polinomial y se selecciono el mejor ajuste entre grados bajos por RMSE.
+
+\begin{itemize}
+    \item DP exacta: grado \DPDegree, $R^2 = \DPRSquared$, RMSE $= \DPRMSE$, polinomio \DPPolynomial.
+    \item Greedy: grado \GreedyDegree, $R^2 = \GreedyRSquared$, RMSE $= \GreedyRMSE$, polinomio \GreedyPolynomial.
+\end{itemize}
+
+\section{Discusion final}
+La programacion dinamica ofrece la solucion optima, pero su costo crece con la longitud de la valla y el numero de pintores. La heuristica greedy es mas rapida y, en promedio, produce soluciones cercanas a la optima, pero no garantiza optimalidad. Por ello, greedy es util cuando se prioriza velocidad y se acepta una perdida controlada de calidad; si se requiere la mejor solucion posible, la DP sigue siendo necesaria.
+
+\section{Video individual}
+El video debe cubrir: problema elegido, subproblemas, criterio greedy, diferencias entre greedy y DP, y la calidad observada de la heuristica.
+
+\end{document}

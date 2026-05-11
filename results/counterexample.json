@@ -1,0 +1,25 @@
+{
+  "fence_length": 3,
+  "intervals": [
+    {
+      "left": 0,
+      "right": 1,
+      "cost": 2.0,
+      "name": "b0"
+    },
+    {
+      "left": 1,
+      "right": 2,
+      "cost": 1.0,
+      "name": "b1"
+    },
+    {
+      "left": 1,
+      "right": 3,
+      "cost": 9.0,
+      "name": "b2"
+    }
+  ],
+  "optimal_cost": 11.0,
+  "greedy_cost": 12.0
+}
