@@ -226,7 +226,7 @@ $L$ & $n$ & $L+n$ & DP med. (ms) & Greedy med. (ms) & Raz\'on media \\
 \bottomrule
 \end{{tabular}}
 
-\paragraph{{Counterexample usado en la discusion de greedy choice property.}} La instancia encontrada por busqueda aleatoria contiene la siguiente lista de intervalos:
+\paragraph{{Contraejemplo usado en la discusion de greedy choice property.}} La instancia encontrada por busqueda aleatoria contiene la siguiente lista de intervalos:
 
 \begin{{tabular}}{{rrrr}}
 \toprule
@@ -257,7 +257,7 @@ def Main() -> None:
     SummaryCsvPath = ResultsDir / "BenchmarkSummary.csv"
     PlotPath = ResultsDir / "BenchmarkScatter.png"
     SummaryTexPath = ResultsDir / "BenchmarkSummary.tex"
-    CounterexampleJsonPath = ResultsDir / "Counterexample.json"
+    CounterexampleJsonPath = ResultsDir / "Contraejemplo.json"
 
     _WriteCsv(Rows, CsvPath)
     _WriteCsv(SummaryRows, SummaryCsvPath)

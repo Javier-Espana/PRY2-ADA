@@ -206,7 +206,7 @@ def FindGreedyCounterexample(
     Greedy = SolveGreedyHeuristic(FallbackInstance, 3)
     if Optimal.Feasible and Greedy.Feasible and Greedy.TotalCost > Optimal.TotalCost:
         return FallbackInstance, Optimal, Greedy
-    raise RuntimeError("Counterexample not found within the search budget")
+    raise RuntimeError("Contraejemplo no encontrado dentro del presupuesto de búsqueda")
 
 
 def InstanceSize(FenceLength: int, PainterCount: int) -> int:

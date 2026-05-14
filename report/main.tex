@@ -10,40 +10,55 @@
 \usepackage{hyperref}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+% Localizar etiquetas del entorno algorithm/algpseudocode al español
+\usepackage{float}
+\floatname{algorithm}{Algoritmo}
+\renewcommand{\listalgorithmname}{Lista de algoritmos}
+\renewcommand{\algorithmicrequire}{\textbf{Requerir:}}
+\renewcommand{\algorithmicensure}{\textbf{Garantizar:}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{entonces}}
+\renewcommand{\algorithmicelse}{\textbf{si no}}
+\renewcommand{\algorithmicfor}{\textbf{Para}}
+\renewcommand{\algorithmicdo}{\textbf{hacer}}
+\renewcommand{\algorithmicwhile}{\textbf{Mientras}}
+\renewcommand{\algorithmicreturn}{\textbf{Retornar}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicprocedure}{\textbf{Procedimiento}}
 \geometry{margin=1in}
 
-\title{Proyecto \#2 2026: Paint the Fence -- Minimum Cost Interval Cover}
+\title{Proyecto \#2 2026: Pintar la valla -- Cobertura de intervalos de costo mínimo}
 \author{Grupo de trabajo}
 \date{Mayo 2026}
 
 \begin{document}
 \maketitle
 
-\section{Descripcion del problema}
-Se modela una valla discreta con posiciones enteras desde $0$ hasta $L$. Cada pintor $i$ cubre un intervalo cerrado $[l_i, r_i]$ y tiene un costo positivo $c_i$. El objetivo es seleccionar un subconjunto de pintores cuya union cubra toda la valla y cuyo costo total sea minimo.
+\section{Descripción del problema}
+Se modela una valla discreta con posiciones enteras desde $0$ hasta $L$. Cada pintor $i$ cubre un intervalo cerrado $[l_i, r_i]$ y tiene un costo positivo $c_i$. El objetivo es seleccionar un subconjunto de pintores cuya unión cubra toda la valla y cuyo costo total sea mínimo.
 
-Este problema es una variante clasica de cobertura de intervalos ponderada. Para los experimentos de este proyecto se asume que las coordenadas son enteras, de modo que la programacion dinamica puede recorrer la valla posicion por posicion.
+Este problema es una variante clásica de cobertura de intervalos ponderada. Para los experimentos de este proyecto se asume que las coordenadas son enteras, de modo que la programación dinámica puede recorrer la valla posición por posición.
 
-\section{Analisis del problema}
-\subsection{Subestructura optima}
-Sea $dp[x]$ el costo minimo para cubrir el prefijo $[0,x]$. Una solucion optima para $[0,x]$ termina con algun intervalo $i$ que cubre la posicion $x$. Si ese intervalo inicia en $l_i$, entonces todo el prefijo anterior $[0,l_i-1]$ debe estar cubierto de manera optima, porque cualquier solucion mejor para ese prefijo produciria una solucion mejor para $[0,x]$.
+\section{Análisis del problema}
+\subsection{Subestructura óptima}
+Sea $dp[x]$ el costo mínimo para cubrir el prefijo $[0,x]$. Una solución óptima para $[0,x]$ termina con algún intervalo $i$ que cubre la posición $x$. Si ese intervalo inicia en $l_i$, entonces todo el prefijo anterior $[0,l_i-1]$ debe estar cubierto de manera óptima, porque cualquier solución mejor para ese prefijo produciría una solución mejor para $[0,x]$.
 
-Por tanto, el problema presenta subestructura optima.
+Por tanto, el problema presenta subestructura óptima.
 
-\subsection{Relacion de recurrencia}
+\subsection{Relación de recurrencia}
 La recurrencia exacta es:
 \[
 dp[x] = \min_{i:\, l_i \le x \le r_i} \left(dp[l_i - 1] + c_i\right),
 \]
 donde $dp[-1] = 0$. Si no existe intervalo que cubra $x$, entonces $dp[x] = \infty$.
 
-\section{Algoritmos de solucion}
-\subsection{Programacion dinamica}
+\section{Algoritmos de solución}
+\subsection{Programación dinámica}
 \begin{algorithm}[H]
 \caption{DP exacta para cobertura de la valla}
 \begin{algorithmic}[1]
 \Require Valla de longitud $L$, intervalos $(l_i, r_i, c_i)$
-\Ensure Costo minimo y conjunto de intervalos elegidos
+\Ensure Costo mínimo y conjunto de intervalos elegidos
 \State Inicializar $dp[0..L] \leftarrow \infty$
 \For{$x \leftarrow 0$ to $L$}
     \State $mejor \leftarrow \infty$
@@ -55,60 +70,58 @@ donde $dp[-1] = 0$. Si no existe intervalo que cubra $x$, entonces $dp[x] = \inf
     \EndFor
     \State $dp[x] \leftarrow mejor$
 \EndFor
-\State Reconstruir la solucion siguiendo los punteros guardados
+\State Reconstruir la solución siguiendo los punteros guardados
 \end{algorithmic}
 \end{algorithm}
 
-Su tiempo de ejecucion es $O(nL)$, donde $n$ es la cantidad de pintores y $L$ la longitud de la valla. Como depende del valor numerico de $L$, es una solucion pseudo-polynomial.
+Su tiempo de ejecución es $O(nL)$, donde $n$ es la cantidad de pintores y $L$ la longitud de la valla. Como depende del valor numérico de $L$, es una solución pseudo-polynomial.
 
 \subsection{Greedy}
 \begin{algorithm}[H]
-\caption{Heuristica greedy por eficiencia cobertura/costo}
+\caption{Heurística greedy por eficiencia cobertura/costo}
 \begin{algorithmic}[1]
 \Require Valla de longitud $L$, intervalos $(l_i, r_i, c_i)$
-\Ensure Cobertura heuristica
+\Ensure Cobertura heurística
 \State Ordenar intervalos por $l_i$
 \State $x \leftarrow 0$
 \While{$x \le L$}
     \State Insertar en una cola de prioridad los intervalos con $l_i \le x$
     \State Eliminar intervalos vencidos con $r_i < x$
     \State Seleccionar el intervalo con mayor $\frac{r_i-l_i+1}{c_i}$, rompiendo empates por mayor $r_i$
-    \State Agregarlo a la solucion y actualizar $x \leftarrow r_i + 1$
+    \State Agregarlo a la solución y actualizar $x \leftarrow r_i + 1$
 \EndWhile
 \end{algorithmic}
 \end{algorithm}
 
 La complejidad es $O(n \log n)$: cada intervalo entra y sale de la cola de prioridad una sola vez.
 
-\section{Discusion sobre greedy choice property}
-Esta propiedad no se cumple en general para el problema ponderado. El criterio local de mayor eficiencia cobertura/costo puede escoger un intervalo barato y aparentemente conveniente que obliga a pagar mas en los pasos siguientes, mientras que una opcion ligeramente menos atractiva a corto plazo puede conducir a una solucion globalmente mas barata.
+\section{Discusión sobre greedy choice property}
+Esta propiedad no se cumple en general para el problema ponderado. El criterio local de mayor eficiencia cobertura/costo puede escoger un intervalo barato y aparentemente conveniente que obliga a pagar más en los pasos siguientes, mientras que una opción ligeramente menos atractiva a corto plazo puede conducir a una solución globalmente más barata.
 
-El archivo de resultados genera automaticamente un contraejemplo concreto y documenta que el costo de la heuristica es mayor que el de la solucion exacta.
-
-\section{Analisis empirico}
-Se ejecutaron ambas implementaciones sobre familias reproducibles de instancias aleatorias factibles. La semilla y los tamanos se fijaron para obtener mediciones honestas y repetibles. Cada tamano se ejecuto varias veces y se reporto la mediana de tiempos.
+El archivo de resultados genera automáticamente un contraejemplo concreto y documenta que el costo de la heurística es mayor que el de la solución exacta.
+Se ejecutaron ambas implementaciones sobre familias reproducibles de instancias aleatorias factibles. La semilla y los tamaños se fijaron para obtener mediciones honestas y repetibles. Cada tamaño se ejecutó varias veces y se reportó la mediana de tiempos.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\linewidth]{../results/BenchmarkScatter.png}
-\caption{Tiempos de ejecucion de la DP exacta y de la heuristica greedy en funcion del tamano de entrada.}
+\caption{Tiempos de ejecución de la DP exacta y de la heurística greedy en función del tamaño de entrada.}
 \end{figure}
 
 \subsection{Datos usados}
 \input{../results/BenchmarkSummary.tex}
 
-\subsection{Regresion polinomial}
-Para cada algoritmo se ajustaron polinomios de grado 1 a 4. El grado optimo se selecciono minimizando el Criterio de Informacion Bayesiano ($\text{BIC} = n\ln(\text{MSE}) + k\ln n$, con $k$ parametros y $n$ mediciones), que penaliza parametros adicionales mas fuertemente que el $R^2$ ajustado y favorece el modelo mas parsimonioso. Teoricamente se espera grado~2 para la DP (complejidad $O(nL) = O(L^2)$ con $n = 2L$, equivalente a $O((\text{tama\~no de entrada})^2)$) y grado~1 o~2 para Greedy (cuyo $O(n\log n)$ es ligeramente superlineal).
+\subsection{Regresión polinomial}
+Para cada algoritmo se ajustaron polinomios de grado 1 a 4. El grado óptimo se seleccionó minimizando el Criterio de Información Bayesiano ($\text{BIC} = n\ln(\text{MSE}) + k\ln n$, con $k$ parámetros y $n$ mediciones), que penaliza parámetros adicionales más fuertemente que el $R^2$ ajustado y favorece el modelo más parsimonioso. Teóricamente se espera grado~2 para la DP (complejidad $O(nL) = O(L^2)$ con $n = 2L$, equivalente a $O((\text{tamaño de entrada})^2)$) y grado~1 o~2 para Greedy (cuyo $O(n\log n)$ es ligeramente superlineal).
 
 \begin{itemize}
     \item DP exacta: grado \DPDegree, $R^2 = \DPRSquared$, $R^2_{\text{adj}} = \DPAdjRSquared$, RMSE $= \DPRMSE$\,ms, polinomio \DPPolynomial.
     \item Greedy: grado \GreedyDegree, $R^2 = \GreedyRSquared$, $R^2_{\text{adj}} = \GreedyAdjRSquared$, RMSE $= \GreedyRMSE$\,ms, polinomio \GreedyPolynomial.
 \end{itemize}
 
-\section{Discusion final}
-La programacion dinamica ofrece la solucion optima, pero su costo crece con la longitud de la valla y el numero de pintores. La heuristica greedy es mas rapida y, en promedio, produce soluciones cercanas a la optima, pero no garantiza optimalidad. Por ello, greedy es util cuando se prioriza velocidad y se acepta una perdida controlada de calidad; si se requiere la mejor solucion posible, la DP sigue siendo necesaria.
+\section{Discusión final}
+La programación dinámica ofrece la solución óptima, pero su costo crece con la longitud de la valla y el número de pintores. La heurística greedy es más rápida y, en promedio, produce soluciones cercanas a la óptima, pero no garantiza optimalidad. Por ello, greedy es útil cuando se prioriza velocidad y se acepta una pérdida controlada de calidad; si se requiere la mejor solución posible, la DP sigue siendo necesaria.
 
 \section{Video individual}
-El video debe cubrir: problema elegido, subproblemas, criterio greedy, diferencias entre greedy y DP, y la calidad observada de la heuristica.
+El video debe cubrir: problema elegido, subproblemas, criterio greedy, diferencias entre greedy y DP, y la calidad observada de la heurística.
 
 \end{document}
