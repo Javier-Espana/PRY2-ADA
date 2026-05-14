@@ -9,9 +9,9 @@ Implementacion en Python para comparar dos enfoques sobre el problema de cobertu
 ## Estructura
 
 - `PaintTheFence.py`: modelos y algoritmos.
-- `scripts/Benchmark.py`: generacion de datos, ajuste polinomial y artefactos de resultados.
+- `scripts/benchmark.py`: generacion de datos, ajuste polinomial y artefactos de resultados.
 - `tests/TestPaintTheFence.py`: pruebas basicas de consistencia.
-- `report/Main.tex`: informe en LaTeX.
+- `report/main.tex`: informe en LaTeX.
 - `results/`: CSV, figura y fragmentos LaTeX generados por el benchmark.
 
 ## Ejecucion
@@ -31,7 +31,7 @@ python3 -m unittest discover -s tests -p "Test*.py"
 Generar resultados empiricos:
 
 ```bash
-python3 scripts/Benchmark.py
+python3 scripts/benchmark.py
 ```
 
 Compilar el informe:
