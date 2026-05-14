@@ -1,25 +1,25 @@
 {
-  "fence_length": 3,
-  "intervals": [
+  "FenceLength": 3,
+  "Intervals": [
     {
-      "left": 0,
-      "right": 1,
-      "cost": 2.0,
-      "name": "b0"
+      "Left": 0,
+      "Right": 1,
+      "Cost": 2.0,
+      "Name": "b0"
     },
     {
-      "left": 1,
-      "right": 2,
-      "cost": 1.0,
-      "name": "b1"
+      "Left": 1,
+      "Right": 2,
+      "Cost": 1.0,
+      "Name": "b1"
     },
     {
-      "left": 1,
-      "right": 3,
-      "cost": 9.0,
-      "name": "b2"
+      "Left": 1,
+      "Right": 3,
+      "Cost": 9.0,
+      "Name": "b2"
     }
   ],
-  "optimal_cost": 11.0,
-  "greedy_cost": 12.0
+  "OptimalCost": 11.0,
+  "GreedyCost": 12.0
 }

@@ -90,19 +90,19 @@ Se ejecutaron ambas implementaciones sobre familias reproducibles de instancias 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../results/benchmark_scatter.png}
+\includegraphics[width=0.95\linewidth]{../results/BenchmarkScatter.png}
 \caption{Tiempos de ejecucion de la DP exacta y de la heuristica greedy en funcion del tamano de entrada.}
 \end{figure}
 
 \subsection{Datos usados}
-\input{../results/benchmark_summary.tex}
+\input{../results/BenchmarkSummary.tex}
 
 \subsection{Regresion polinomial}
-Para cada algoritmo se ajusto una regresion polinomial y se selecciono el mejor ajuste entre grados bajos por RMSE.
+Para cada algoritmo se ajustaron polinomios de grado 1 a 4. El grado optimo se selecciono minimizando el Criterio de Informacion Bayesiano ($\text{BIC} = n\ln(\text{MSE}) + k\ln n$, con $k$ parametros y $n$ mediciones), que penaliza parametros adicionales mas fuertemente que el $R^2$ ajustado y favorece el modelo mas parsimonioso. Teoricamente se espera grado~2 para la DP (complejidad $O(nL) = O(L^2)$ con $n = 2L$, equivalente a $O((\text{tama\~no de entrada})^2)$) y grado~1 o~2 para Greedy (cuyo $O(n\log n)$ es ligeramente superlineal).
 
 \begin{itemize}
-    \item DP exacta: grado \DPDegree, $R^2 = \DPRSquared$, RMSE $= \DPRMSE$, polinomio \DPPolynomial.
-    \item Greedy: grado \GreedyDegree, $R^2 = \GreedyRSquared$, RMSE $= \GreedyRMSE$, polinomio \GreedyPolynomial.
+    \item DP exacta: grado \DPDegree, $R^2 = \DPRSquared$, $R^2_{\text{adj}} = \DPAdjRSquared$, RMSE $= \DPRMSE$\,ms, polinomio \DPPolynomial.
+    \item Greedy: grado \GreedyDegree, $R^2 = \GreedyRSquared$, $R^2_{\text{adj}} = \GreedyAdjRSquared$, RMSE $= \GreedyRMSE$\,ms, polinomio \GreedyPolynomial.
 \end{itemize}
 
 \section{Discusion final}

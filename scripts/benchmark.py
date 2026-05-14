@@ -1,209 +1,228 @@
-"""Benchmark runner for the Paint the Fence project.
-
-It generates reproducible random instances, measures the exact DP and the greedy
-heuristic, fits polynomial regressions, and writes LaTeX/CSV artifacts into results/.
-"""
-
 from __future__ import annotations
 
-import argparse
-import csv
-import json
-import statistics as stats
-import sys
-import time
-import random
+import argparse as Argparse
+import csv as Csv
+import json as Json
+import statistics as Stats
+import sys as Sys
+import time as Time
+import random as RandomModule
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as Plt
+import numpy as Np
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+Root = Path(__file__).resolve().parents[1]
+if str(Root) not in Sys.path:
+    Sys.path.insert(0, str(Root))
 
-from paint_the_fence import (  # noqa: E402
-    find_greedy_counterexample,
-    generate_feasible_instance,
-    instance_size,
-    solve_exact_dp,
-    solve_greedy_heuristic,
+from PaintTheFence import (
+    FindGreedyCounterexample,
+    GenerateFeasibleInstance,
+    InstanceSize,
+    SolveExactDp,
+    SolveGreedyHeuristic,
 )
 
-
-RESULTS_DIR = ROOT / "results"
-RESULTS_DIR.mkdir(exist_ok=True)
-
-
-def _time_call(function, *args):
-    start = time.perf_counter()
-    result = function(*args)
-    end = time.perf_counter()
-    return result, (end - start) * 1000.0
+ResultsDir = Root / "results"
+ResultsDir.mkdir(exist_ok=True)
 
 
-def _fit_best_polynomial(x_values: np.ndarray, y_values: np.ndarray, max_degree: int = 4):
-    best = None
-    for degree in range(1, min(max_degree, len(x_values) - 1) + 1):
-        coefficients = np.polyfit(x_values, y_values, degree)
-        polynomial = np.poly1d(coefficients)
-        prediction = polynomial(x_values)
-        residuals = y_values - prediction
-        mse = float(np.mean(residuals**2))
-        rmse = float(np.sqrt(mse))
-        ss_res = float(np.sum(residuals**2))
-        ss_tot = float(np.sum((y_values - np.mean(y_values)) ** 2))
-        r_squared = 1.0 if ss_tot == 0 else 1.0 - ss_res / ss_tot
-        candidate = {
-            "degree": degree,
-            "coefficients": coefficients,
-            "polynomial": polynomial,
-            "mse": mse,
-            "rmse": rmse,
-            "r_squared": r_squared,
+def _TimeCall(Function, *Args):
+    Start = Time.perf_counter()
+    Result = Function(*Args)
+    End = Time.perf_counter()
+    return Result, (End - Start) * 1000.0
+
+
+def _FitBestPolynomial(XValues: Np.ndarray, YValues: Np.ndarray, MaxDegree: int = 4):
+    """Select polynomial degree by minimising BIC (Bayesian Information Criterion).
+
+    BIC = n·ln(MSE) + k·ln(n), where k = degree+1 (number of fitted parameters).
+    BIC penalises extra parameters more strongly than adjusted R², which prevents
+    overfitting on small samples and favours the theoretically parsimonious degree.
+    """
+    import math as _Math
+
+    Best = None
+    N = len(XValues)
+    LogN = _Math.log(N)
+    for Degree in range(1, min(MaxDegree, N - 1) + 1):
+        Coefficients = Np.polyfit(XValues, YValues, Degree)
+        Polynomial = Np.poly1d(Coefficients)
+        Prediction = Polynomial(XValues)
+        Residuals = YValues - Prediction
+        Mse = float(Np.mean(Residuals**2))
+        Rmse = float(Np.sqrt(Mse))
+        SsRes = float(Np.sum(Residuals**2))
+        SsTot = float(Np.sum((YValues - Np.mean(YValues)) ** 2))
+        RSquared = 1.0 if SsTot == 0 else 1.0 - SsRes / SsTot
+        AdjRSquared = (
+            1.0 - (1.0 - RSquared) * (N - 1) / max(1, N - Degree - 1)
+            if SsTot != 0 else 1.0
+        )
+        # BIC: lower is better; a higher degree wins only when MSE drops enough
+        # to offset the ln(n) penalty per added parameter.
+        Bic = (
+            N * _Math.log(max(Mse, 1e-300)) + (Degree + 1) * LogN
+            if Mse > 0 else -float("inf")
+        )
+        Candidate = {
+            "Degree": Degree,
+            "Coefficients": Coefficients,
+            "Polynomial": Polynomial,
+            "Mse": Mse,
+            "Rmse": Rmse,
+            "RSquared": RSquared,
+            "AdjRSquared": AdjRSquared,
+            "BIC": Bic,
         }
-        if best is None or candidate["rmse"] < best["rmse"]:
-            best = candidate
-    if best is None:
+        if Best is None or Candidate["BIC"] < Best["BIC"]:
+            Best = Candidate
+    if Best is None:
         raise RuntimeError("no polynomial fit could be computed")
-    return best
+    return Best
 
 
-def _format_polynomial(coefficients: np.ndarray) -> str:
-    degree = len(coefficients) - 1
-    pieces = []
-    for index, coefficient in enumerate(coefficients):
-        power = degree - index
-        value = float(coefficient)
-        if abs(value) < 1e-12:
+def _FormatPolynomial(Coefficients: Np.ndarray) -> str:
+    Degree = len(Coefficients) - 1
+    Pieces = []
+    for Index, Coefficient in enumerate(Coefficients):
+        Power = Degree - Index
+        Value = float(Coefficient)
+        if abs(Value) < 1e-12:
             continue
-        sign = "+" if value >= 0 else "-"
-        magnitude = abs(value)
-        if power == 0:
-            term = f"{magnitude:.6g}"
-        elif power == 1:
-            term = f"{magnitude:.6g}x"
+        Sign = "+" if Value >= 0 else "-"
+        Magnitude = abs(Value)
+        if Power == 0:
+            Term = f"{Magnitude:.6g}"
+        elif Power == 1:
+            Term = f"{Magnitude:.6g}x"
         else:
-            term = f"{magnitude:.6g}x^{power}"
-        if not pieces:
-            pieces.append(term if value >= 0 else f"-{term}")
+            Term = f"{Magnitude:.6g}x^{Power}"
+        if not Pieces:
+            Pieces.append(Term if Value >= 0 else f"-{Term}")
         else:
-            pieces.append(f" {sign} {term}")
-    return "".join(pieces) if pieces else "0"
+            Pieces.append(f" {Sign} {Term}")
+    return "".join(Pieces) if Pieces else "0"
 
 
-def _write_csv(rows, path: Path) -> None:
-    with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
-        writer.writeheader()
-        writer.writerows(rows)
+def _WriteCsv(Rows, CsvPath: Path) -> None:
+    with CsvPath.open("w", newline="", encoding="utf-8") as Handle:
+        Writer = Csv.DictWriter(Handle, fieldnames=list(Rows[0].keys()))
+        Writer.writeheader()
+        Writer.writerows(Rows)
 
 
-def _make_plot(summary_rows, dp_fit, greedy_fit, output_path: Path) -> None:
-    x = np.array([row["input_size"] for row in summary_rows], dtype=float)
-    dp_y = np.array([row["dp_median_ms"] for row in summary_rows], dtype=float)
-    greedy_y = np.array([row["greedy_median_ms"] for row in summary_rows], dtype=float)
+def _MakePlot(SummaryRows, DpFit, GreedyFit, OutputPath: Path) -> None:
+    XValues = Np.array([Row["InputSize"] for Row in SummaryRows], dtype=float)
+    DpY = Np.array([Row["DpMedianMs"] for Row in SummaryRows], dtype=float)
+    GreedyY = Np.array([Row["GreedyMedianMs"] for Row in SummaryRows], dtype=float)
 
-    x_dense = np.linspace(float(np.min(x)), float(np.max(x)), 400)
+    XDense = Np.linspace(float(Np.min(XValues)), float(Np.max(XValues)), 400)
 
-    plt.style.use("seaborn-v0_8-whitegrid")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.scatter(x, dp_y, color="#1f77b4", label="DP exacta", s=45)
-    ax.scatter(x, greedy_y, color="#d62728", label="Greedy", s=45)
-    ax.plot(x_dense, dp_fit["polynomial"](x_dense), color="#1f77b4", alpha=0.8)
-    ax.plot(x_dense, greedy_fit["polynomial"](x_dense), color="#d62728", alpha=0.8)
-    ax.set_xlabel("Tamano de la entrada (L + n)")
-    ax.set_ylabel("Tiempo medio de ejecucion (ms)")
-    ax.set_title("Cobertura de la valla: comparacion de tiempos")
-    ax.legend()
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
-    plt.close(fig)
+    Plt.rcParams["font.family"] = "DejaVu Sans"
+    Plt.style.use("seaborn-v0_8-whitegrid")
+    Fig, Ax = Plt.subplots(figsize=(10, 6))
+    Ax.scatter(XValues, DpY, color="#1f77b4", label="DP exacta", s=45)
+    Ax.scatter(XValues, GreedyY, color="#d62728", label="Greedy", s=45)
+    Ax.plot(XDense, DpFit["Polynomial"](XDense), color="#1f77b4", alpha=0.8)
+    Ax.plot(XDense, GreedyFit["Polynomial"](XDense), color="#d62728", alpha=0.8)
+    Ax.set_xlabel("Tamaño de la entrada (L + n)")
+    Ax.set_ylabel("Tiempo medio de ejecución (ms)")
+    Ax.set_title("Cobertura de la valla: comparación de tiempos")
+    Ax.legend()
+    Fig.tight_layout()
+    Fig.savefig(OutputPath, dpi=200)
+    Plt.close(Fig)
 
 
-def run_benchmark(fence_lengths, repetitions: int, seed: int):
-    rows = []
-    summary_rows = []
-    for fence_length in fence_lengths:
-        painter_count = fence_length * 2
-        dp_times = []
-        greedy_times = []
-        ratios = []
-        for repetition in range(repetitions):
-            instance_seed = seed + fence_length * 1000 + repetition
-            random_instance = random.Random(instance_seed)
-            intervals = generate_feasible_instance(fence_length, painter_count, random_instance)
+def RunBenchmark(FenceLengths, Repetitions: int, Seed: int):
+    Rows = []
+    SummaryRows = []
+    for FenceLength in FenceLengths:
+        PainterCount = FenceLength * 2
+        DpTimes = []
+        GreedyTimes = []
+        Ratios = []
+        for Repetition in range(Repetitions):
+            InstanceSeed = Seed + FenceLength * 1000 + Repetition
+            RandomInstance = RandomModule.Random(InstanceSeed)
+            Intervals = GenerateFeasibleInstance(FenceLength, PainterCount, RandomInstance)
 
-            exact, exact_ms = _time_call(solve_exact_dp, intervals, fence_length)
-            greedy, greedy_ms = _time_call(solve_greedy_heuristic, intervals, fence_length)
+            Exact, ExactMs = _TimeCall(SolveExactDp, Intervals, FenceLength)
+            Greedy, GreedyMs = _TimeCall(SolveGreedyHeuristic, Intervals, FenceLength)
 
-            if not exact.feasible:
-                raise RuntimeError(f"exact solver failed on fence_length={fence_length}")
-            if not greedy.feasible:
-                raise RuntimeError(f"greedy solver failed on fence_length={fence_length}")
+            if not Exact.Feasible:
+                raise RuntimeError(f"Exact solver failed on FenceLength={FenceLength}")
+            if not Greedy.Feasible:
+                raise RuntimeError(f"Greedy solver failed on FenceLength={FenceLength}")
 
-            ratio = greedy.total_cost / exact.total_cost if exact.total_cost else float("nan")
-            rows.append(
+            Ratio = Greedy.TotalCost / Exact.TotalCost if Exact.TotalCost else float("nan")
+            Rows.append(
                 {
-                    "fence_length": fence_length,
-                    "painter_count": painter_count,
-                    "input_size": instance_size(fence_length, painter_count),
-                    "repetition": repetition,
-                    "exact_ms": exact_ms,
-                    "greedy_ms": greedy_ms,
-                    "optimal_cost": exact.total_cost,
-                    "greedy_cost": greedy.total_cost,
-                    "approximation_ratio": ratio,
+                    "FenceLength": FenceLength,
+                    "PainterCount": PainterCount,
+                    "InputSize": InstanceSize(FenceLength, PainterCount),
+                    "Repetition": Repetition,
+                    "ExactMs": ExactMs,
+                    "GreedyMs": GreedyMs,
+                    "OptimalCost": Exact.TotalCost,
+                    "GreedyCost": Greedy.TotalCost,
+                    "ApproximationRatio": Ratio,
                 }
             )
-            dp_times.append(exact_ms)
-            greedy_times.append(greedy_ms)
-            ratios.append(ratio)
+            DpTimes.append(ExactMs)
+            GreedyTimes.append(GreedyMs)
+            Ratios.append(Ratio)
 
-        summary_rows.append(
+        SummaryRows.append(
             {
-                "fence_length": fence_length,
-                "painter_count": painter_count,
-                "input_size": instance_size(fence_length, painter_count),
-                "dp_median_ms": float(stats.median(dp_times)),
-                "greedy_median_ms": float(stats.median(greedy_times)),
-                "ratio_mean": float(stats.mean(ratios)),
-                "ratio_max": float(max(ratios)),
+                "FenceLength": FenceLength,
+                "PainterCount": PainterCount,
+                "InputSize": InstanceSize(FenceLength, PainterCount),
+                "DpMedianMs": float(Stats.median(DpTimes)),
+                "GreedyMedianMs": float(Stats.median(GreedyTimes)),
+                "RatioMean": float(Stats.mean(Ratios)),
+                "RatioMax": float(max(Ratios)),
             }
         )
 
-    return rows, summary_rows
+    return Rows, SummaryRows
 
 
-def _write_summary_tex(summary_rows, dp_fit, greedy_fit, counterexample, path: Path) -> None:
-    counterexample_instance, optimal, greedy = counterexample
-    interval_rows = []
-    for interval in counterexample_instance:
-        interval_rows.append(f"{interval.name or '-'} & {interval.left} & {interval.right} & {interval.cost:.0f} \\\\")
+def _WriteSummaryTex(SummaryRows, DpFit, GreedyFit, Counterexample, OutputPath: Path) -> None:
+    CounterexampleInstance, Optimal, Greedy = Counterexample
+    IntervalRows = []
+    for IntervalItem in CounterexampleInstance:
+        IntervalRows.append(
+            f"{IntervalItem.Name or '-'} & {IntervalItem.Left} & {IntervalItem.Right} & {IntervalItem.Cost:.0f} \\\\")
 
-    table_rows = []
-    for row in summary_rows:
-        table_rows.append(
-            f"{row['fence_length']} & {row['painter_count']} & {row['input_size']} & "
-            f"{row['dp_median_ms']:.4f} & {row['greedy_median_ms']:.4f} & {row['ratio_mean']:.4f} \\\\")
+    TableRows = []
+    for Row in SummaryRows:
+        TableRows.append(
+            f"{Row['FenceLength']} & {Row['PainterCount']} & {Row['InputSize']} & "
+            f"{Row['DpMedianMs']:.4f} & {Row['GreedyMedianMs']:.4f} & {Row['RatioMean']:.4f} \\\\")
 
-    content = rf"""% Auto-generated by scripts/benchmark.py
-\newcommand{{\DPPolynomial}}{{\ensuremath{{{_format_polynomial(dp_fit['coefficients'])}}}}}
-\newcommand{{\GreedyPolynomial}}{{\ensuremath{{{_format_polynomial(greedy_fit['coefficients'])}}}}}
-\newcommand{{\DPDegree}}{{{dp_fit['degree']}}}
-\newcommand{{\GreedyDegree}}{{{greedy_fit['degree']}}}
-\newcommand{{\DPRSquared}}{{{dp_fit['r_squared']:.4f}}}
-\newcommand{{\GreedyRSquared}}{{{greedy_fit['r_squared']:.4f}}}
-\newcommand{{\DPRMSE}}{{{dp_fit['rmse']:.4f}}}
-\newcommand{{\GreedyRMSE}}{{{greedy_fit['rmse']:.4f}}}
-\newcommand{{\MeanApproxRatio}}{{{float(stats.mean([row['ratio_mean'] for row in summary_rows])):.4f}}}
-\newcommand{{\WorstApproxRatio}}{{{float(max(row['ratio_max'] for row in summary_rows)):.4f}}}
+    Content = rf"""% generado por scripts/Benchmark.py
+\newcommand{{\DPPolynomial}}{{\ensuremath{{{_FormatPolynomial(DpFit['Coefficients'])}}}}}
+\newcommand{{\GreedyPolynomial}}{{\ensuremath{{{_FormatPolynomial(GreedyFit['Coefficients'])}}}}}
+\newcommand{{\DPDegree}}{{{DpFit['Degree']}}}
+\newcommand{{\GreedyDegree}}{{{GreedyFit['Degree']}}}
+\newcommand{{\DPRSquared}}{{{DpFit['RSquared']:.4f}}}
+\newcommand{{\GreedyRSquared}}{{{GreedyFit['RSquared']:.4f}}}
+\newcommand{{\DPAdjRSquared}}{{{DpFit['AdjRSquared']:.4f}}}
+\newcommand{{\GreedyAdjRSquared}}{{{GreedyFit['AdjRSquared']:.4f}}}
+\newcommand{{\DPRMSE}}{{{DpFit['Rmse']:.4f}}}
+\newcommand{{\GreedyRMSE}}{{{GreedyFit['Rmse']:.4f}}}
+\newcommand{{\MeanApproxRatio}}{{{float(Stats.mean([Row['RatioMean'] for Row in SummaryRows])):.4f}}}
+\newcommand{{\WorstApproxRatio}}{{{float(max(Row['RatioMax'] for Row in SummaryRows)):.4f}}}
 
 \begin{{tabular}}{{rrrrrr}}
 \toprule
 $L$ & $n$ & $L+n$ & DP med. (ms) & Greedy med. (ms) & Raz\'on media \\
 \midrule
-{chr(10).join(table_rows)}
+{chr(10).join(TableRows)}
 \bottomrule
 \end{{tabular}}
 
@@ -213,72 +232,77 @@ $L$ & $n$ & $L+n$ & DP med. (ms) & Greedy med. (ms) & Raz\'on media \\
 \toprule
 Nombre & Izquierda & Derecha & Costo \\
 \midrule
-{chr(10).join(interval_rows)}
+{chr(10).join(IntervalRows)}
 \bottomrule
 \end{{tabular}}
 
-La solucion optima exacta cuesta {optimal.total_cost:.0f} y la heuristica greedy cuesta {greedy.total_cost:.0f}.
+La solucion optima exacta cuesta {Optimal.TotalCost:.0f} y la heuristica greedy cuesta {Greedy.TotalCost:.0f}.
 """
-    path.write_text(content, encoding="utf-8")
+    OutputPath.write_text(Content, encoding="utf-8")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--seed", type=int, default=2026)
-    parser.add_argument("--repetitions", type=int, default=5)
-    parser.add_argument("--min-length", type=int, default=100)
-    parser.add_argument("--max-length", type=int, default=800)
-    parser.add_argument("--step", type=int, default=100)
-    args = parser.parse_args()
+def Main() -> None:
+    Parser = Argparse.ArgumentParser(description="benchmark runner")
+    Parser.add_argument("--seed", dest="Seed", type=int, default=2026)
+    Parser.add_argument("--repetitions", dest="Repetitions", type=int, default=15)
+    Parser.add_argument("--min-length", dest="MinLength", type=int, default=50)
+    Parser.add_argument("--max-length", dest="MaxLength", type=int, default=1000)
+    Parser.add_argument("--step", dest="Step", type=int, default=50)
+    Args = Parser.parse_args()
 
-    fence_lengths = list(range(args.min_length, args.max_length + 1, args.step))
-    rows, summary_rows = run_benchmark(fence_lengths, args.repetitions, args.seed)
+    FenceLengths = list(range(Args.MinLength, Args.MaxLength + 1, Args.Step))
+    Rows, SummaryRows = RunBenchmark(FenceLengths, Args.Repetitions, Args.Seed)
 
-    csv_path = RESULTS_DIR / "benchmark.csv"
-    summary_csv_path = RESULTS_DIR / "benchmark_summary.csv"
-    plot_path = RESULTS_DIR / "benchmark_scatter.png"
-    summary_tex_path = RESULTS_DIR / "benchmark_summary.tex"
-    counterexample_json_path = RESULTS_DIR / "counterexample.json"
+    CsvPath = ResultsDir / "Benchmark.csv"
+    SummaryCsvPath = ResultsDir / "BenchmarkSummary.csv"
+    PlotPath = ResultsDir / "BenchmarkScatter.png"
+    SummaryTexPath = ResultsDir / "BenchmarkSummary.tex"
+    CounterexampleJsonPath = ResultsDir / "Counterexample.json"
 
-    _write_csv(rows, csv_path)
-    _write_csv(summary_rows, summary_csv_path)
+    _WriteCsv(Rows, CsvPath)
+    _WriteCsv(SummaryRows, SummaryCsvPath)
 
-    x = np.array([row["input_size"] for row in summary_rows], dtype=float)
-    dp_y = np.array([row["dp_median_ms"] for row in summary_rows], dtype=float)
-    greedy_y = np.array([row["greedy_median_ms"] for row in summary_rows], dtype=float)
-    dp_fit = _fit_best_polynomial(x, dp_y)
-    greedy_fit = _fit_best_polynomial(x, greedy_y)
+    XValues = Np.array([Row["InputSize"] for Row in SummaryRows], dtype=float)
+    DpY = Np.array([Row["DpMedianMs"] for Row in SummaryRows], dtype=float)
+    GreedyY = Np.array([Row["GreedyMedianMs"] for Row in SummaryRows], dtype=float)
+    DpFit = _FitBestPolynomial(XValues, DpY)
+    GreedyFit = _FitBestPolynomial(XValues, GreedyY)
 
-    counterexample = find_greedy_counterexample()
-    instance, optimal, greedy = counterexample
-    counterexample_fence_length = max(interval.right for interval in instance)
-    counterexample_json_path.write_text(
-        json.dumps(
+    Counterexample = FindGreedyCounterexample()
+    Instance, Optimal, Greedy = Counterexample
+    CounterexampleFenceLength = max(IntervalItem.Right for IntervalItem in Instance)
+    CounterexampleJsonPath.write_text(
+        Json.dumps(
             {
-                "fence_length": counterexample_fence_length,
-                "intervals": [
-                    {"left": interval.left, "right": interval.right, "cost": interval.cost, "name": interval.name}
-                    for interval in instance
+                "FenceLength": CounterexampleFenceLength,
+                "Intervals": [
+                    {
+                        "Left": IntervalItem.Left,
+                        "Right": IntervalItem.Right,
+                        "Cost": IntervalItem.Cost,
+                        "Name": IntervalItem.Name,
+                    }
+                    for IntervalItem in Instance
                 ],
-                "optimal_cost": optimal.total_cost,
-                "greedy_cost": greedy.total_cost,
+                "OptimalCost": Optimal.TotalCost,
+                "GreedyCost": Greedy.TotalCost,
             },
             indent=2,
         ),
         encoding="utf-8",
     )
 
-    _make_plot(summary_rows, dp_fit, greedy_fit, plot_path)
-    _write_summary_tex(summary_rows, dp_fit, greedy_fit, counterexample, summary_tex_path)
+    _MakePlot(SummaryRows, DpFit, GreedyFit, PlotPath)
+    _WriteSummaryTex(SummaryRows, DpFit, GreedyFit, Counterexample, SummaryTexPath)
 
-    print(f"Wrote {csv_path}")
-    print(f"Wrote {summary_csv_path}")
-    print(f"Wrote {plot_path}")
-    print(f"Wrote {summary_tex_path}")
-    print(f"Wrote {counterexample_json_path}")
-    print(f"DP fit: degree {dp_fit['degree']}, R^2={dp_fit['r_squared']:.4f}")
-    print(f"Greedy fit: degree {greedy_fit['degree']}, R^2={greedy_fit['r_squared']:.4f}")
+    print(f"Wrote {CsvPath}")
+    print(f"Wrote {SummaryCsvPath}")
+    print(f"Wrote {PlotPath}")
+    print(f"Wrote {SummaryTexPath}")
+    print(f"Wrote {CounterexampleJsonPath}")
+    print(f"DP fit:     degree {DpFit['Degree']}, R²={DpFit['RSquared']:.4f}, R²_adj={DpFit['AdjRSquared']:.4f}, BIC={DpFit['BIC']:.2f}")
+    print(f"Greedy fit: degree {GreedyFit['Degree']}, R²={GreedyFit['RSquared']:.4f}, R²_adj={GreedyFit['AdjRSquared']:.4f}, BIC={GreedyFit['BIC']:.2f}")
 
 
 if __name__ == "__main__":
-    main()
+    Main()
