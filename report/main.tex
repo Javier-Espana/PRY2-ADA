@@ -55,19 +55,14 @@ En este informe se estudia la variante por subconjuntos del problema de cobertur
 \noindent
 Sea $dp[mask]$ el costo mínimo para cubrir exactamente el subconjunto de secciones indicado por $mask$. Una solución óptima para un estado $mask$ se obtiene añadiendo un pintor $i$ a una solución óptima de otro estado anterior $prev$, con $mask = prev \cup mask_i$.
 
+Por tanto, el problema presenta subestructura óptima: si existiera una mejor solución para el estado previo, entonces también existiría una mejor solución para el estado actual.
+
 \subsection{Relación de recurrencia}
 \noindent
 Se modela la valla como un conjunto de $n$ secciones discretas. Cada pintor $i$ cubre un subconjunto arbitrario de esas secciones, representado mediante una máscara de bits, y tiene un costo positivo $c_i$. El objetivo es seleccionar un subconjunto de pintores cuya unión cubra todas las secciones y cuyo costo total sea mínimo.
 
 Esta formulación es equivalente a una instancia de cobertura sobre subconjuntos y conduce de manera natural a un algoritmo exacto exponencial en $n$. En los experimentos del proyecto se trabaja directamente con máscaras de bits, por lo que la programación dinámica recorre el espacio de subconjuntos cubiertos.
 
-\section{Análisis del problema}
-\subsection{Subestructura óptima}
-Sea $dp[mask]$ el costo mínimo para cubrir exactamente el subconjunto de secciones indicado por $mask$. Una solución óptima para un estado $mask$ se obtiene añadiendo un pintor $i$ a una solución óptima de otro estado anterior $prev$, con $mask = prev \cup mask_i$.
-
-Por tanto, el problema presenta subestructura óptima: si existiera una mejor solución para el estado previo, entonces también existiría una mejor solución para el estado actual.
-
-\subsection{Relación de recurrencia}
 La recurrencia exacta es:
 \[
 dp[mask \cup mask_i] = \min\bigl(dp[mask \cup mask_i],\, dp[mask] + c_i\bigr),
@@ -112,7 +107,7 @@ Su tiempo de ejecución es $O(2^n \cdot m)$, donde $n$ es la cantidad de seccion
 En la implementación usada para los experimentos, la heurística recorre todos los pintores en cada elección, por lo que su complejidad es $O(m^2)$ en número de comparaciones, con costo adicional lineal en el tamaño de las máscaras; en notación gruesa, puede expresarse como $O(m^2 n)$. Aun así, resulta mucho más rápida en la práctica que la DP exacta.
 
 \section{Discusión sobre la heurística greedy}
-Esta propiedad no se cumple en general para el problema ponderado. El criterio local de mayor cobertura nueva por costo puede escoger un pintor barato y aparentemente conveniente que obliga a pagar más en los pasos siguientes, mientras que una opción ligeramente menos atractiva a corto plazo puede conducir a una solución globalmente más barata.
+El problema no presenta la \textbf{greedy choice property} (propiedad de elección golosa). Esta propiedad no se cumple en general para el problema ponderado. El criterio local de mayor cobertura nueva por costo puede escoger un pintor barato y aparentemente conveniente que obliga a pagar más en los pasos siguientes, mientras que una opción ligeramente menos atractiva a corto plazo puede conducir a una solución globalmente más barata.
 
 Los resultados empíricos se presentan en la siguiente subsección, donde se muestran la comparación de tiempos, el ajuste teórico seleccionado y el contraejemplo usado para ilustrar el comportamiento de la heurística.
 
@@ -136,7 +131,15 @@ En el repositorio se documenta la implementación de esta variante exacta (\text
 \subsubsection{Resultados empíricos para subconjuntos}
 \input{../results/BenchmarkSubsets.tex}
 
-\section{Video individual}
-El video debe cubrir: problema de cobertura por subconjuntos, subproblemas, criterio greedy, diferencias entre greedy y DP, y la calidad observada de la heurística.
+\section{Enlaces de entrega}
+\textbf{Repositorio de código:} \url{https://github.com/usuario/repo} (Reemplazar con enlace real)
+
+\textbf{Videos individuales (YouTube):}
+El video de cada integrante debe cubrir: problema de cobertura por subconjuntos, subproblemas, criterio greedy, diferencias entre greedy y DP, y la calidad observada de la heurística.
+\begin{itemize}
+    \item Javier España: \url{https://youtube.com/...} (Reemplazar con enlace real)
+    \item Angel Esquit: \url{https://youtube.com/...} (Reemplazar con enlace real)
+    \item Roberto Barreda: \url{https://youtube.com/...} (Reemplazar con enlace real)
+\end{itemize}
 
 \end{document}
