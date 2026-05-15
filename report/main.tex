@@ -4,7 +4,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath, amssymb}
 \usepackage{booktabs}
-\usepackage{geometry}
+\usepackage[letterpaper,portrait,margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{hyperref}
@@ -28,13 +28,35 @@
 \geometry{margin=1in}
 
 \title{Proyecto \#2 2026: Pintar la valla -- Cobertura de subconjuntos de costo mínimo}
-\author{Grupo de trabajo}
+\author{Javier Eduardo Espa\~na Pacheco (23361) \\
+Angel Esteban Esquit Hern\'andez (23221) \\
+Roberto Jos\'e Barreda Siekavizza (23354)}
 \date{Mayo 2026}
 
 \begin{document}
 \maketitle
 
-\section{Descripción del problema}
+\begin{abstract}
+Se presenta la formulación por subconjuntos del problema de pintar una valla discretizada en $n$ secciones. Se describen el algoritmo exacto (programación dinámica sobre subconjuntos) y una heurística greedy, se analizan sus complejidades y se muestran resultados empíricos que comparan tiempos y calidad de solución. Además se incluye un contraejemplo que ilustra la suboptimalidad de la heurística.
+\end{abstract}
+
+\section{Introducción}
+En este informe se estudia la variante por subconjuntos del problema de cobertura de costo mínimo aplicado al problema de pintar una valla. Se exponen motivaciones, contribuciones y la estructura del documento.
+
+\section{Formulación del problema}
+\label{sec:problem}
+\noindent
+\textbf{Instancia:} Un entero $n$ (número de secciones) y un conjunto de $m$ pintores, cada uno definido por una máscara de secciones $mask_i$ y un costo $c_i>0$. \\
+\textbf{Objetivo:} Seleccionar un subconjunto de pintores cuya unión cubra todas las $n$ secciones con costo total mínimo.
+
+\section{Análisis del problema}
+\label{sec:analysis}
+\subsection{Subestructura óptima}
+\noindent
+Sea $dp[mask]$ el costo mínimo para cubrir exactamente el subconjunto de secciones indicado por $mask$. Una solución óptima para un estado $mask$ se obtiene añadiendo un pintor $i$ a una solución óptima de otro estado anterior $prev$, con $mask = prev \cup mask_i$.
+
+\subsection{Relación de recurrencia}
+\noindent
 Se modela la valla como un conjunto de $n$ secciones discretas. Cada pintor $i$ cubre un subconjunto arbitrario de esas secciones, representado mediante una máscara de bits, y tiene un costo positivo $c_i$. El objetivo es seleccionar un subconjunto de pintores cuya unión cubra todas las secciones y cuyo costo total sea mínimo.
 
 Esta formulación es equivalente a una instancia de cobertura sobre subconjuntos y conduce de manera natural a un algoritmo exacto exponencial en $n$. En los experimentos del proyecto se trabaja directamente con máscaras de bits, por lo que la programación dinámica recorre el espacio de subconjuntos cubiertos.
@@ -89,35 +111,21 @@ Su tiempo de ejecución es $O(2^n \cdot m)$, donde $n$ es la cantidad de seccion
 
 En la implementación usada para los experimentos, la heurística recorre todos los pintores en cada elección, por lo que su complejidad es $O(m^2)$ en número de comparaciones, con costo adicional lineal en el tamaño de las máscaras; en notación gruesa, puede expresarse como $O(m^2 n)$. Aun así, resulta mucho más rápida en la práctica que la DP exacta.
 
-\section{Discusión sobre greedy choice property}
+\section{Discusión sobre la heurística greedy}
 Esta propiedad no se cumple en general para el problema ponderado. El criterio local de mayor cobertura nueva por costo puede escoger un pintor barato y aparentemente conveniente que obliga a pagar más en los pasos siguientes, mientras que una opción ligeramente menos atractiva a corto plazo puede conducir a una solución globalmente más barata.
 
-El archivo de resultados genera automáticamente un contraejemplo concreto y documenta que el costo de la heurística es mayor que el de la solución exacta.
-Se ejecutaron ambas implementaciones sobre familias reproducibles de instancias aleatorias factibles. La semilla y los tamaños se fijaron para obtener mediciones honestas y repetibles. Cada tamaño se ejecutó varias veces y se reportó la mediana de tiempos.
+Los resultados empíricos se presentan en la siguiente subsección, donde se muestran la comparación de tiempos, el ajuste teórico seleccionado y el contraejemplo usado para ilustrar el comportamiento de la heurística.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\linewidth]{../results/BenchmarkScatter.png}
-\caption{Tiempos de ejecución de la DP exacta y de la heurística greedy en función del tamaño de entrada para la formulación por subconjuntos.}
-\end{figure}
+\subsection{Ajuste teórico}
+Para cada algoritmo se compararon formas candidatas acordes con su complejidad esperada. En DP se probaron familias exponenciales y de potencia; en Greedy se probaron formas cuadráticas y $n\log n$. El ajuste elegido se seleccionó minimizando el Criterio de Información Bayesiano ($\text{BIC} = n\ln(\text{MSE}) + k\ln n$, con $k$ parámetros y $n$ mediciones), que penaliza parámetros adicionales más fuertemente que el $R^2$ ajustado.
 
-\subsection{Datos usados}
-\input{../results/BenchmarkSummary.tex}
+Los nombres exactos del ajuste seleccionado, su ecuación estimada y sus métricas aparecen en la tabla empotrada más abajo, junto con el resto de los resultados empíricos.
 
-\subsection{Regresión polinomial}
-Para cada algoritmo se ajustaron polinomios de grado 1 a 4. El grado óptimo se seleccionó minimizando el Criterio de Información Bayesiano ($\text{BIC} = n\ln(\text{MSE}) + k\ln n$, con $k$ parámetros y $n$ mediciones), que penaliza parámetros adicionales más fuertemente que el $R^2$ ajustado y favorece el modelo más parsimonioso. Teóricamente se espera crecimiento exponencial para la DP sobre subconjuntos y un crecimiento mucho más suave para Greedy.
+\section{Conclusiones}
+La programación dinámica sobre subconjuntos ofrece la solución óptima, pero su costo crece exponencialmente con el número de secciones ($\Theta(2^n)$). La heurística greedy es significativamente más rápida en la práctica y suele producir soluciones cercanas a la óptima, aunque no garantiza optimalidad. En proyectos con restricciones fuertes de tiempo, greedy es apropiada; cuando se requiere certidumbre sobre optimalidad, la DP exacta es necesaria.
 
-\begin{itemize}
-    \item DP exacta: grado \DPDegreeSubsets, $R^2 = \DPRSquaredSubsets$, polinomio \DPPolynomialSubsets.
-    \item Greedy: grado \GreedyDegreeSubsets, $R^2 = \GreedyRSquaredSubsets$, polinomio \GreedyPolynomialSubsets.
-\end{itemize}
-
-\section{Discusión final}
-La programación dinámica sobre subconjuntos ofrece la solución óptima, pero su costo crece exponencialmente con el número de secciones. La heurística greedy es más rápida y, en promedio, produce soluciones cercanas a la óptima, pero no garantiza optimalidad. Por ello, greedy es útil cuando se prioriza velocidad y se acepta una pérdida controlada de calidad; si se requiere la mejor solución posible, la DP sigue siendo necesaria.
-
-En el repositorio se documenta la implementación de esta variante exacta (\texttt{SolveExactDp\_Subsets}) y de su heurística asociada (\texttt{SolveGreedyHeuristic\_Subsets}), además del generador de instancias factibles (\texttt{GenerateFeasibleInstance\_Subsets}). También se incluyen pruebas unitarias y un benchmark que compara tiempos de ambas implementaciones en la carpeta \texttt{scripts/} y vuelca resultados en \texttt{results/}.
-
-Por tanto, si el requerimiento del curso pide explícitamente que el algoritmo exacto sea superpolinomial en el tamaño de la representación de la entrada, la formulación por subconjuntos satisface ese requisito con complejidad $\Theta(2^n)$. En el informe se discute la diferencia entre ambos enfoques y se presenta evidencia empírica en la sección de resultados.
+\subsection*{Implementación y artefactos del repositorio}
+En el repositorio se documenta la implementación de esta variante exacta (\texttt{SolveExactDp\_Subsets}) y de su heurística asociada (\texttt{SolveGreedyHeuristic\_Subsets}), además del generador de instancias factibles (\texttt{GenerateFeasibleInstance\_Subsets}), pruebas unitarias y un benchmark que vuelca resultados en \texttt{results/}.
 
 \begin{figure}[H]
 \centering

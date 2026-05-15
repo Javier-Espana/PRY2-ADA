@@ -4,12 +4,12 @@ Javier Eduardo España Pacheco #23361
 Angel Esteban Esquit Hernández #23221
 Roberto José Barreda Siekavizza #23354
 
-Implementacion en Python para comparar dos enfoques sobre el problema de cobertura de intervalos con costo minimo:
+Implementacion en Python para estudiar una formulacion por subsets del problema de cobertura con costo minimo:
 
 ## Estructura
 
-- `PaintTheFence.py`: modelos y algoritmos.
-- `scripts/benchmark.py`: generacion de datos, ajuste polinomial y artefactos de resultados.
+- `PaintTheFence.py`: modelos y algoritmos por subsets.
+- `scripts/benchmark.py`: generacion de datos, ajuste polinomial y artefactos de resultados para subsets.
 - `tests/TestPaintTheFence.py`: pruebas basicas de consistencia.
 - `report/main.tex`: informe en LaTeX.
 - `results/`: CSV, figura y fragmentos LaTeX generados por el benchmark.
