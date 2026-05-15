@@ -215,3 +215,126 @@ def InstanceSize(FenceLength: int, PainterCount: int) -> int:
 
 def IntervalsToRows(Intervals: Sequence[Interval]) -> list[tuple[str, int, int, float]]:
     return [(IntervalItem.Name, IntervalItem.Left, IntervalItem.Right, IntervalItem.Cost) for IntervalItem in Intervals]
+
+
+# --- Subset variant: painters cover arbitrary subsets of discrete sections ---
+@dataclass(frozen=True, slots=True)
+class PainterSubset:
+    Mask: int
+    Cost: float
+    Name: str = ""
+
+
+def SolveExactDp_Subsets(Painters: Sequence[PainterSubset], Sections: int) -> CoverResult:
+    if Sections < 0:
+        raise ValueError("Sections must be non-negative")
+    Target = (1 << Sections) - 1
+    M = len(Painters)
+
+    InfCost = float('inf')
+    Dp = [InfCost] * (1 << Sections)
+    Parent: list[tuple[int, int] | None] = [None] * (1 << Sections)
+    Dp[0] = 0.0
+
+    for mask in range(1 << Sections):
+        if Dp[mask] == InfCost:
+            continue
+        for idx, painter in enumerate(Painters):
+            newmask = mask | painter.Mask
+            cost = Dp[mask] + painter.Cost
+            if cost < Dp[newmask]:
+                Dp[newmask] = cost
+                Parent[newmask] = (mask, idx)
+
+    if Dp[Target] == InfCost:
+        return CoverResult(False, Inf, tuple(), "DpSubsets")
+
+    # reconstruct
+    chosen: list[PainterSubset] = []
+    cur = Target
+    while cur != 0:
+        entry = Parent[cur]
+        if entry is None:
+            break
+        prevmask, idx = entry
+        chosen.append(Painters[idx])
+        cur = prevmask
+
+    chosen.reverse()
+    # Build Intervals-like cover check: convert to covered sections set
+    Feasible = (sum(p.Mask for p in chosen) | 0) & Target == Target
+    return CoverResult(Feasible, sum(p.Cost for p in chosen) if Feasible else Inf, tuple(), "DpSubsets")
+
+
+def SolveGreedyHeuristic_Subsets(Painters: Sequence[PainterSubset], Sections: int) -> CoverResult:
+    if Sections < 0:
+        raise ValueError("Sections must be non-negative")
+    Target = (1 << Sections) - 1
+    Remaining = 0
+    Chosen: list[PainterSubset] = []
+    Covered = 0
+    PaintersList = list(Painters)
+
+    while Covered != Target:
+        best_idx = None
+        best_score = -1.0
+        best_new = 0
+        for idx, p in enumerate(PaintersList):
+            newbits = p.Mask & (~Covered)
+            newcount = newbits.bit_count()
+            if newcount == 0:
+                continue
+            score = newcount / p.Cost
+            if score > best_score:
+                best_score = score
+                best_idx = idx
+                best_new = newbits
+
+        if best_idx is None:
+            return CoverResult(False, Inf, tuple(), "GreedySubsets")
+
+        p = PaintersList[best_idx]
+        Chosen.append(p)
+        Covered |= p.Mask
+
+    return CoverResult(True, sum(p.Cost for p in Chosen), tuple(), "GreedySubsets")
+
+
+def GenerateFeasibleInstance_Subsets(Sections: int, PainterCount: int, Rng: Random) -> list[PainterSubset]:
+    if Sections <= 0:
+        raise ValueError("Sections must be positive")
+    if PainterCount <= 0:
+        raise ValueError("PainterCount must be positive")
+
+    Painters: list[PainterSubset] = []
+    # backbone: ensure each section has a cheap painter
+    for s in range(Sections):
+        mask = 1 << s
+        cost = float(Rng.randint(1, 3))
+        Painters.append(PainterSubset(Mask=mask, Cost=cost, Name=f"b{s}"))
+
+    # add random multi-section painters
+    while len(Painters) < PainterCount:
+        mask = 0
+        for s in range(Sections):
+            if Rng.random() < 0.5:
+                mask |= 1 << s
+        if mask == 0:
+            mask = 1 << Rng.randint(0, Sections - 1)
+        cost = float(Rng.randint(1, 10))
+        Painters.append(PainterSubset(Mask=mask, Cost=cost, Name=f"r{len(Painters)}"))
+
+    # ensure coverage
+    union = 0
+    for p in Painters:
+        union |= p.Mask
+    if union != (1 << Sections) - 1:
+        missing = ((1 << Sections) - 1) & ~union
+        s = 0
+        while missing:
+            bit = missing & -missing
+            missing &= missing - 1
+            Painters.append(PainterSubset(Mask=bit, Cost=1.0, Name=f"fix{s}"))
+            s += 1
+
+    return Painters
