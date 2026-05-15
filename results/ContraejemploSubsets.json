@@ -1,0 +1,87 @@
+{
+  "Sections": 11,
+  "Painters": [
+    {
+      "Mask": 1,
+      "Cost": 2.0,
+      "Name": "b0"
+    },
+    {
+      "Mask": 2,
+      "Cost": 3.0,
+      "Name": "b1"
+    },
+    {
+      "Mask": 4,
+      "Cost": 3.0,
+      "Name": "b2"
+    },
+    {
+      "Mask": 8,
+      "Cost": 2.0,
+      "Name": "b3"
+    },
+    {
+      "Mask": 16,
+      "Cost": 3.0,
+      "Name": "b4"
+    },
+    {
+      "Mask": 32,
+      "Cost": 2.0,
+      "Name": "b5"
+    },
+    {
+      "Mask": 64,
+      "Cost": 3.0,
+      "Name": "b6"
+    },
+    {
+      "Mask": 128,
+      "Cost": 2.0,
+      "Name": "b7"
+    },
+    {
+      "Mask": 256,
+      "Cost": 3.0,
+      "Name": "b8"
+    },
+    {
+      "Mask": 512,
+      "Cost": 3.0,
+      "Name": "b9"
+    },
+    {
+      "Mask": 1024,
+      "Cost": 3.0,
+      "Name": "b10"
+    },
+    {
+      "Mask": 108,
+      "Cost": 6.0,
+      "Name": "r11"
+    },
+    {
+      "Mask": 518,
+      "Cost": 2.0,
+      "Name": "r12"
+    },
+    {
+      "Mask": 105,
+      "Cost": 6.0,
+      "Name": "r13"
+    },
+    {
+      "Mask": 1341,
+      "Cost": 10.0,
+      "Name": "r14"
+    },
+    {
+      "Mask": 53,
+      "Cost": 3.0,
+      "Name": "r15"
+    }
+  ],
+  "OptimalCost": 17.0,
+  "GreedyCost": 18.0
+}

@@ -124,9 +124,18 @@ La programación dinámica ofrece la solución óptima, pero su costo crece con 
 \subsection{Variante por subconjuntos y complejidad exponencial}
 Se propone una variante del problema en la que la valla se modela como un conjunto de $n$ secciones discretas (número de secciones = $n$) y cada pintor $i$ puede cubrir un subconjunto arbitrario de estas secciones (representado por una máscara de bits). En esta formulación natural, una programación dinámica que guarda el costo mínimo para cada subconjunto cubierto tiene $2^n$ estados y realiza transiciones por cada pintor, con coste total $O(2^n\cdot m)$, donde $m$ es el número de pintores.
 
-Esta variante convierte el algoritmo exacto en un algoritmo verdaderamente exponencial en $n$ (no meramente pseudopolinómico respecto a la representación numérica de parámetros). En el repositorio se incluyó una implementación de esta variante (`SolveExactDp_Subsets`) y una heurística greedy análoga (`SolveGreedyHeuristic_Subsets`), además de un generador de instancias (`GenerateFeasibleInstance_Subsets`). También se añadieron pruebas unitarias y un benchmark que compara tiempos de ambas implementaciones en la carpeta `scripts/` y vuelca resultados en `results/`.
+Esta variante convierte el algoritmo exacto en un algoritmo verdaderamente exponencial en $n$ (no meramente pseudopolinómico respecto a la representación numérica de parámetros). En el repositorio se incluyó una implementación de esta variante (\texttt{SolveExactDp\_Subsets}) y una heurística greedy análoga (\texttt{SolveGreedyHeuristic\_Subsets}), además de un generador de instancias (\texttt{GenerateFeasibleInstance\_Subsets}). También se añadieron pruebas unitarias y un benchmark que compara tiempos de ambas implementaciones en la carpeta \texttt{scripts/} y vuelca resultados en \texttt{results/}.
 
-Por tanto, si el requerimiento del curso pide explícitamente que el algoritmo exacto sea superpolinomial en el tamaño de la representación de la entrada, la variante por subconjuntos satisface ese requisito (complejidad $	heta(2^n)$). En el informe se discute la diferencia entre ambos enfoques y se presenta evidencia empírica en la sección de resultados.
+Por tanto, si el requerimiento del curso pide explícitamente que el algoritmo exacto sea superpolinomial en el tamaño de la representación de la entrada, la variante por subconjuntos satisface ese requisito (complejidad $\Theta(2^n)$). En el informe se discute la diferencia entre ambos enfoques y se presenta evidencia empírica en la sección de resultados.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../results/BenchmarkSubsetsScatter.png}
+\caption{Tiempos de ejecución para la variante por subconjuntos (exponencial).}
+\end{figure}
+
+\subsubsection{Resultados empíricos para subconjuntos}
+\input{../results/BenchmarkSubsets.tex}
 
 \section{Video individual}
 El video debe cubrir: problema elegido, subproblemas, criterio greedy, diferencias entre greedy y DP, y la calidad observada de la heurística.

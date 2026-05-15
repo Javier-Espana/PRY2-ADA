@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.2)  10 MAY 2026 21:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.2)  14 MAY 2026 20:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -382,26 +382,26 @@ LaTeX Info: Redefining \% on input line 11.
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 19.
-LaTeX Font Info:    ... okay on input line 19.
-LaTeX Info: Redefining \. on input line 19.
-LaTeX Info: Redefining \% on input line 19.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Info: Redefining \. on input line 34.
+LaTeX Info: Redefining \% on input line 34.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -459,38 +459,51 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 19.
+Package hyperref Info: Link coloring OFF on input line 34.
 
 (./main.out) (./main.out)
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 21.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 36.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 21.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 36.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 43.
+put line 58.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/
 dvips/cm-super/cm-super-t1.enc}] [2]
-<../results/benchmark_scatter.png, id=81, 722.7pt x 433.62pt>
-File: ../results/benchmark_scatter.png Graphic file (type png)
-<use ../results/benchmark_scatter.png>
-Package pdftex.def Info: ../results/benchmark_scatter.png  used on input line 9
-3.
+<../results/BenchmarkScatter.png, id=85, 722.7pt x 433.62pt>
+File: ../results/BenchmarkScatter.png Graphic file (type png)
+<use ../results/BenchmarkScatter.png>
+Package pdftex.def Info: ../results/BenchmarkScatter.png  used on input line 10
+6.
 (pdftex.def)             Requested size: 446.26582pt x 267.76312pt.
- (../results/benchmark_summary.tex [3 <../results/benchmark_scatter.png>]) [4] 
-(./main.aux
+ (../results/BenchmarkSummary.tex [3 <../results/BenchmarkScatter.png>]) [4]
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 1
+27.
+ (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
+)
+<../results/BenchmarkSubsetsScatter.png, id=99, 722.7pt x 433.62pt>
+File: ../results/BenchmarkSubsetsScatter.png Graphic file (type png)
+<use ../results/BenchmarkSubsetsScatter.png>
+Package pdftex.def Info: ../results/BenchmarkSubsetsScatter.png  used on input 
+line 133.
+(pdftex.def)             Requested size: 446.26582pt x 267.76312pt.
+
+(../results/BenchmarkSubsets.tex [5 <../results/BenchmarkSubsetsScatter.png>]
+[6]) [7] (./main.aux
 LaTeX Info: Redefining \. on input line 11.
 LaTeX Info: Redefining \% on input line 11.
 )
@@ -499,16 +512,16 @@ LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 7C53A4EDEE89813B0163CCBE35D4B010;1979.
+(rerunfilecheck)             Checksum: CB03E536282AAB997661A50CC9ABE692;2475.
  ) 
 Here is how much of TeX's memory you used:
- 12504 strings out of 474222
- 191058 string characters out of 5748734
- 1934975 words of memory out of 5000000
- 34574 multiletter control sequences out of 15000+600000
- 570430 words of font info for 68 fonts, out of 8000000 for 9000
+ 12561 strings out of 474222
+ 192523 string characters out of 5748734
+ 1941975 words of memory out of 5000000
+ 34616 multiletter control sequences out of 15000+600000
+ 572274 words of font info for 71 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,7n,79p,450b,458s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,7n,79p,754b,458s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share
 /texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texliv
@@ -518,13 +531,15 @@ nts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf/fonts/type1/public/cm-super/
 sfbx1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb></usr/s
 hare/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf/fonts/typ
-e1/public/cm-super/sfrm0900.pfb></usr/share/texmf/fonts/type1/public/cm-super/s
-frm1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/sh
-are/texmf/fonts/type1/public/cm-super/sfrm1728.pfb>
-Output written on main.pdf (4 pages, 296062 bytes).
+e1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/s
+frm0900.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.pfb></usr/sh
+are/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/fonts/type
+1/public/cm-super/sfrm1728.pfb></usr/share/texmf/fonts/type1/public/cm-super/sf
+tt1095.pfb>
+Output written on main.pdf (7 pages, 477981 bytes).
 PDF statistics:
- 161 PDF objects out of 1000 (max. 8388607)
- 123 compressed objects within 2 object streams
- 22 named destinations out of 1000 (max. 500000)
- 110 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 194 PDF objects out of 1000 (max. 8388607)
+ 147 compressed objects within 2 object streams
+ 28 named destinations out of 1000 (max. 500000)
+ 123 words of extra memory for PDF output out of 10000 (max. 10000000)
 

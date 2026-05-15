@@ -1,0 +1,50 @@
+% generado por scripts/Benchmark.py (subsets)
+\newcommand{\DPPolynomialSubsets}{\ensuremath{0.00916671x^4 - 1.11521x^3 + 47.6431x^2 - 832.199x + 4926.36}}
+\newcommand{\GreedyPolynomialSubsets}{\ensuremath{2.69557e-06x^3 - 0.000284585x^2 + 0.00924939x - 0.0335413}}
+\newcommand{\DPDegreeSubsets}{4}
+\newcommand{\GreedyDegreeSubsets}{3}
+\newcommand{\DPRSquaredSubsets}{0.9889}
+\newcommand{\GreedyRSquaredSubsets}{0.8238}
+
+\begin{tabular}{rrrrrr}
+    oprule
+Sections & m & n & DP med. (ms) & Greedy med. (ms) & Raz\'on media \\
+\midrule
+4 & 8 & 12 & 0.0445 & 0.0386 & 1.1333 \\\\
+6 & 12 & 18 & 0.1534 & 0.0646 & 1.1944 \\\\
+8 & 16 & 24 & 0.7745 & 0.0542 & 1.1500 \\\\
+10 & 20 & 30 & 3.5180 & 0.0602 & 1.0556 \\\\
+12 & 24 & 36 & 16.9851 & 0.0602 & 1.1111 \\\\
+14 & 28 & 42 & 57.9343 & 0.0497 & 1.0000 \\\\
+16 & 32 & 48 & 259.8466 & 0.0566 & 1.1111 \\\\
+18 & 36 & 54 & 973.2595 & 0.0575 & 1.0333 \\\\
+20 & 40 & 60 & 4515.8174 & 0.0800 & 1.0333 \\\\
+\bottomrule
+\end{tabular}
+
+\paragraph{Contraejemplo (variante por subconjuntos).} Instancia encontrada por busqueda aleatoria (máscara y costo):
+
+\begin{tabular}{rrr}
+    oprule
+Nombre & Mascara & Costo \\
+\midrule
+b0 & 0b1 & 2 \\\\
+b1 & 0b10 & 3 \\\\
+b2 & 0b100 & 3 \\\\
+b3 & 0b1000 & 2 \\\\
+b4 & 0b10000 & 3 \\\\
+b5 & 0b100000 & 2 \\\\
+b6 & 0b1000000 & 3 \\\\
+b7 & 0b10000000 & 2 \\\\
+b8 & 0b100000000 & 3 \\\\
+b9 & 0b1000000000 & 3 \\\\
+b10 & 0b10000000000 & 3 \\\\
+r11 & 0b1101100 & 6 \\\\
+r12 & 0b1000000110 & 2 \\\\
+r13 & 0b1101001 & 6 \\\\
+r14 & 0b10100111101 & 10 \\\\
+r15 & 0b110101 & 3 \\\\
+\bottomrule
+\end{tabular}
+
+La solucion optima exacta cuesta 17 y la heuristica greedy cuesta 18.

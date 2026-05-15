@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import reduce
 from math import inf as Inf
+from operator import or_ as BitwiseOr
 from random import Random
 from typing import Iterable, Sequence
 
@@ -262,7 +264,8 @@ def SolveExactDp_Subsets(Painters: Sequence[PainterSubset], Sections: int) -> Co
 
     chosen.reverse()
     # Build Intervals-like cover check: convert to covered sections set
-    Feasible = (sum(p.Mask for p in chosen) | 0) & Target == Target
+    UnionMask = reduce(BitwiseOr, (p.Mask for p in chosen), 0)
+    Feasible = (UnionMask & Target) == Target
     return CoverResult(Feasible, sum(p.Cost for p in chosen) if Feasible else Inf, tuple(), "DpSubsets")
 
 

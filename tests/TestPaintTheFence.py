@@ -1,6 +1,12 @@
 from __future__ import annotations
 
+import sys as Sys
 import unittest as UnitTest
+from pathlib import Path
+
+Root = Path(__file__).resolve().parents[1]
+if str(Root) not in Sys.path:
+    Sys.path.insert(0, str(Root))
 
 from PaintTheFence import (
     Interval,
