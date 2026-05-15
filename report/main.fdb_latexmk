@@ -1,9 +1,11 @@
 # Fdb version 4
-["pdflatex"] 1778813293.75343 "/home/javier-espana/Escritorio/PRY2-ADA/report/main.tex" "main.pdf" "main" 1778813294.76289 0
-  "../results/BenchmarkScatter.png" 1778813214.04805 136866 0a9fb8ea7d30b65a79d8e04028ac259e ""
-  "../results/BenchmarkSummary.tex" 1778813214.05565 2098 33956953c935bab1eb16450becc86337 ""
+["pdflatex"] 1778816018.6052 "/home/javier-espana/Escritorio/PRY2-ADA/report/main.tex" "main.pdf" "main" 1778816019.85146 0
+  "../results/BenchmarkScatter.png" 1778815963.72521 133456 a03ac19ec085e50566464655f94d3ec3 ""
+  "../results/BenchmarkSubsets.tex" 1778816018.2768 1608 a909d6e3f6cdf2f1c968b8df9a48e215 ""
+  "../results/BenchmarkSubsetsScatter.png" 1778816018.26835 116789 9acaacc185048734668f74cbfa67468b ""
+  "../results/BenchmarkSummary.tex" 1778815963.73673 2048 a507bc8125821bc90dfb2db75c202401 ""
   "/etc/texmf/web2c/texmf.cnf" 1772474562.56508 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/javier-espana/Escritorio/PRY2-ADA/report/main.tex" 1778813292.01985 8436 0c25c926fd0935287084668b10d18300 ""
+  "/home/javier-espana/Escritorio/PRY2-ADA/report/main.tex" 1778813321.07593 8736 668d943de69e36850fd8f44ecf36b6d1 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm" 1136768653 3584 21b378cca2e40816b0e6d74a4dc98f04 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
@@ -120,9 +122,9 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1772474578.36631 5472669 54eaf61a88b6b7896ebd0dac973cb29c ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1772474605 8216988 b052ce15c6ffa080147737c506012723 ""
-  "main.aux" 1778813294.66186 2631 19b22211552ec79c4fe2537799e54c14 "pdflatex"
-  "main.out" 1778813294.66286 2205 32ce3c5486bfac742dac5af77be4d4e8 "pdflatex"
-  "main.tex" 1778813292.01985 8436 0c25c926fd0935287084668b10d18300 ""
+  "main.aux" 1778816019.74543 3095 e4aedf5865a9d4bedc6d41ecd7ff1fb2 "pdflatex"
+  "main.out" 1778816019.74743 2475 cb03e536282aab997661a50cc9abe692 "pdflatex"
+  "main.tex" 1778813321.07593 8736 668d943de69e36850fd8f44ecf36b6d1 ""
   (generated)
   "main.aux"
   "main.log"

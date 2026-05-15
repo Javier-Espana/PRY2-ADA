@@ -2,7 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from PaintTheFence import (
+from src.PaintTheFence import (
     GenerateFeasibleInstance,
     SolveExactDp,
     SolveGreedyHeuristic,
@@ -20,12 +20,8 @@ def main():
 
     if args.benchmark:
         print("Ejecutando benchmarks completos (esto puede tardar unos minutos)...")
-        # Add scripts to path to import benchmark
-        scripts_dir = Path(__file__).parent / "scripts"
-        if str(scripts_dir) not in sys.path:
-            sys.path.insert(0, str(scripts_dir))
         try:
-            import benchmark
+            from scripts import benchmark
             # Reset sys.argv so benchmark's argparse doesn't get confused
             sys.argv = [sys.argv[0]]
             benchmark.Main()

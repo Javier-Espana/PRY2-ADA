@@ -8,7 +8,7 @@ Root = Path(__file__).resolve().parents[1]
 if str(Root) not in Sys.path:
     Sys.path.insert(0, str(Root))
 
-from PaintTheFence import (
+from src.PaintTheFence import (
     Interval,
     CoverIsValid,
     FindGreedyCounterexample,

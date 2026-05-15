@@ -4,7 +4,7 @@ Root = Path(__file__).resolve().parents[1]
 if str(Root) not in sys.path:
     sys.path.insert(0, str(Root))
 
-from PaintTheFence import SolveExactDp_Subsets, PainterSubset
+from src.PaintTheFence import SolveExactDp_Subsets, PainterSubset
 P = [
     PainterSubset(Mask=0b1, Cost=2.0, Name='b0'),
     PainterSubset(Mask=0b10, Cost=1.0, Name='b1'),
