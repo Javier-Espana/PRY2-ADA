@@ -1,8 +1,10 @@
 # Proyecto #2 - Paint the Fence
 
-Javier Eduardo España Pacheco #23361
-Angel Esteban Esquit Hernández #23221
-Roberto José Barreda Siekavizza #23354
+Javier Eduardo España Pacheco #23361 - [Video](https://youtu.be/IIzBpsYeb2Q)
+Angel Esteban Esquit Hernández #23221 - [Video](https://youtu.be/Bq5J55khO2I)
+Roberto José Barreda Siekavizza #23354 - [Video](https://www.youtube.com/watch?v=Xak9TT8B8m8)
+
+**Repositorio:** [https://github.com/Javier-Espana/PRY2-ADA](https://github.com/Javier-Espana/PRY2-ADA)
 
 Implementacion en Python para estudiar una formulacion por subsets del problema de cobertura con costo minimo:
 
